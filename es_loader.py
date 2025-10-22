@@ -31,6 +31,7 @@ class ESLoader:
             self.es_client = Elasticsearch(
                 hosts=[es_host],
                 http_auth=awsauth,
+                port=443,
                 use_ssl=True,
                 verify_certs=True,
                 connection_class=RequestsHttpConnection,
@@ -289,6 +290,10 @@ def main():
             else:
                 logger.warning(
                     f'"model_files" not set in configuration file, {index_name} will not be loaded!')
+        elif index['type'] == 'external':
+            logger.info("External data index created - loading will be done via data retriever service")
+            loader.create_index(index_name, index["mapping"])
+            summary[index_name] = "Index created"
         else:
             logger.error(f'Unknown index type: "{index["type"]}"')
     if indices_list is not None:
